@@ -200,7 +200,7 @@ displayTableEmployees($_SESSION['Employees'], 'Employees');
         border: 1px solid black;
     }
 
-    br {
+    th, td {
         border: 1px solid grey;
     }
 </style>
