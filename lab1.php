@@ -61,6 +61,7 @@ function validationBaseEmployees($array)
         empty($array['salary']) ||
         empty($array['children']) ||
         empty($array['experience']) ||
+        $array['salary'] < 0 ||
         $array['children'] < 0 ||
         $array['experience'] < 0 ||
         !isset($array)
@@ -69,25 +70,25 @@ function validationBaseEmployees($array)
 
 function filterEmployeeByPositionAndChildren($arr, $position, $children)
 {
-    $newArr = [];
-    for ($i = 0; $i < count($arr); $i++) {
-        if ($position == $arr[$i]['position'] && $arr[$i]['children'] < $children) {
-            array_push($newArr, $arr[$i]);
+    return array_filter(
+        $arr,
+        function ($value) use ($position, $children) {
+            return ($value["position"] == $position and $value["children"] < $children);
         }
-    }
+    );
 }
 
 function displayTableEmployees($array, $caption)
 {
-    $table = '<table>';
-    $table .= '<caption> $caption </caption>';
-    $table .= '<tr> <th>id</th> <th>name</th> <th>position</th> <th>salary</th> <th>children</th> <th>experience</th> </tr>';
+    $table = "<table>";
+    $table .= "<caption> $caption </caption>";
+    $table .= "<tr> <th>id</th> <th>name</th> <th>position</th> <th>salary</th> <th>children</th> <th>experience</th> </tr>";
 
     foreach ($array as $item) {
-        $table .= '<tr>' .
-            '<td>$item[id]</td><td>$item[name]</td><td>$item[position]</td>' .
-            '<td>$item[salary]</td><td>$item[children]</td><td>$item[experience]</td>' .
-            '</tr>';
+        $table .= "<tr>" .
+            "<td>$item[id]</td><td>$item[name]</td><td>$item[position]</td>" .
+            "<td>$item[salary]</td><td>$item[children]</td><td>$item[experience]</td>" .
+            "</tr>";
     }
 
     $table .= '</table>';
@@ -120,8 +121,12 @@ if ($_POST['action'] == 'edit') {
             }
         }
     }
+} elseif ($_POST['action'] == 'filter') {
+    displayTableEmployees(
+        filterEmployeeByPositionAndChildren($_SESSION['Employees'], $_POST['position'], $_POST['children']),
+        'Employees'
+    );
 }
-
 
 displayTableEmployees($_SESSION['Employees'], 'Employees');
 ?>
@@ -184,8 +189,8 @@ displayTableEmployees($_SESSION['Employees'], 'Employees');
 
 <form action='<?= $_SERVER['PHP_SELF'] ?>' method='post' id='filterForm'>
     Filter <br>
-    <label> name:
-        <input type='text' name='name'>
+    <label> position:
+        <input type='text' name='position'>
     </label><br>
     <label> children:
         <input type='number' name='children'>
@@ -196,6 +201,18 @@ displayTableEmployees($_SESSION['Employees'], 'Employees');
 
 
 <style>
+    #addForm {
+        display: none;
+    }
+
+    #editForm {
+        display: none;
+    }
+
+    #filterForm {
+        display: none;
+    }
+
     table {
         border: 1px solid black;
     }
@@ -206,19 +223,16 @@ displayTableEmployees($_SESSION['Employees'], 'Employees');
 </style>
 
 
-<form method='get' action=''>
-    <p>Form</p>
-    <label>
-        <input type='number' name='edit' placeholder='Type id for edit'> <br>
-        <input type='number' name='id' placeholder='Id'> <br>
-        <input type='text' name='name' placeholder='Name'> <br>
-        <input type='text' name='position' placeholder='Position'> <br>
-        <input type='number' name='salary' type='number' placeholder='Salary'> <br>
-        <input type='text' name='children' placeholder='Children'>
-        <input type='text' name='experience' placeholder='Experience'>
-        <input type='submit' name='btn-ok' value='ok'>
+<script>
+    function ShowAddForm() {
+        document.querySelector('#addForm').style.display = 'inline';
+    }
 
-        <input type='hidden' name='x-position' value=''>
-        <input type='hidden' name='x-children' value=''>
-    </label>
-</form>
+    function ShowEditForm() {
+        document.querySelector('#editForm').style.display = 'inline';
+    }
+
+    function ShowFilterForm() {
+        document.querySelector('#filterForm').style.display = 'inline';
+    }
+</script>
