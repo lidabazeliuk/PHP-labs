@@ -95,12 +95,16 @@ function displayTableEmployees($array, $caption)
     echo $table;
 }
 
-session_start();
+if (!isset($_SESSION)) {
+    session_start();
+}
 
 
 if (empty($_SESSION)) {
     $_SESSION['Employees'] = getBaseEmployees();
 }
+
+$actionToDo = $_POST['action'];
 
 
 if ($_POST['action'] == 'add') {
