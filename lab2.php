@@ -130,7 +130,14 @@ if ($_POST['action'] == 'edit') {
         filterEmployeeByPositionAndChildren($_SESSION['Employees'], $_POST['position'], $_POST['children']),
         'Employees'
     );
+} elseif ($actionToDo == 'save') {
+    $file = fopen("employees.txt", "w");
+    fwrite($file, serialize($_SESSION['Employees']));
+    fclose($file);
+} elseif ($actionToDo == 'load') {
+    $_SESSION['Employees'] = unserialize(file_get_contents("employees.txt"));
 }
+
 
 displayTableEmployees($_SESSION['Employees'], 'Employees');
 ?>
